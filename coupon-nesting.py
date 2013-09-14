@@ -11,7 +11,7 @@ def openSpreadsheet():
 	root.withdraw()
 	file_path = tkFileDialog.askopenfilename()
 	book = xlrd.open_workbook(file_path)
-    return book.sheet_by_index(0)
+	return book.sheet_by_index(0)
 
 # Input: spreadsheet
 # Output: a dictionary containing the spreadsheet information
