@@ -118,8 +118,8 @@ def getPanelDimensions(sheet, row, ssd):
 
 # Input: spreadsheet, sectionFlag
 # Output: the information for the row parsed
-#def extractRowData(sheet, row, ssd):
- #   if sectionFlag
+def getRectangularCoupon(sheet, row, ssd):
+   return False
 
 # Input: spreadsheet
 # Output: a dictionary containing the spreadsheet information
