@@ -1,5 +1,11 @@
+'''
+Author: Basil Huang
+Date: September 2013
+'''
+
 import xlrd
 import Tkinter, tkFileDialog
+import copy
 
 # This class is the base class for Coupons
 class Coupon:
@@ -43,7 +49,7 @@ class CircularCoupon(Coupon):
 # This function uses the Tkinter library to ask the user for the location
 # of the spreadsheet. Then the spreadsheet is opened up and the spreadsheet 
 # object is returned.
-def openSpreadsheet():
+def oss():#openSpreadsheet():
     root = Tkinter.Tk()
     root.withdraw()
     file_path = tkFileDialog.askopenfilename()
@@ -59,9 +65,31 @@ def isNumber(s):
     except ValueError:
         return False
 
+# Input: currentCell
+# Output: sectionFlag
+def getSectionFlag(currentSF, currentCell):
+    sf = currentSF
+    if (currentCell == 'Defaults'):
+        print "1"
+        sf = 'defaults'
+    elif (currentCell == 'Panel'):
+        sf = 'panel'
+        print "2"
+    elif (currentCell == 'Rectangular Coupons'):
+        sf = 'rectangularCoupons'
+        print "3"
+    elif (currentCell == 'Circular Coupons'):
+        sf = 'circularCoupons'
+        print "4"
+    elif (currentCell == xlrd.empty_cell.value):
+        sf = 'break'
+        print "5"
+    return sf
+
 # Input: spreadsheet, row, spreadsheetDictionary
 # Output: updated spreadsheetDictionary
 def getDefaults(sheet, curr, row, ssd):
+    print "sheet: {0}".format(sheet)
     if curr == 'blade width' and isNumber(sheet.cell_value(row,1)):
         ssd['bladeWidth'] = sheet.cell_value(row, 1)
     elif curr == 'tolerance' and isNumber(sheet.cell_value(row,1)):
@@ -88,26 +116,10 @@ def getPanelDimensions(sheet, row, ssd):
     else:
         return False
 
-# Input: currentCell
-# Output: sectionFlag
-def getSectionFlag(currentCell):
-    if (currentCell == 'Defaults'):
-        sectionFlag = 'defaults'
-    elif (currentCell == 'Panel'):
-        sectionFlag = 'panel'
-    elif (currentCell == 'Rectangular Coupons'):
-        sectionFlag = 'rectangularCoupons'
-    elif (currentCell == 'Circular Coupons'):
-        sectionFlag = 'circularCoupons'
-    elif (currentCell == xlrd.empty_cell.value):
-        sectionFlag = 'break'
-    return sectionFlag
-
-
 # Input: spreadsheet, sectionFlag
 # Output: the information for the row parsed
-# def extractRowData(sheet, sectionFlag):
-#     if sectionFlag
+#def extractRowData(sheet, row, ssd):
+ #   if sectionFlag
 
 # Input: spreadsheet
 # Output: a dictionary containing the spreadsheet information
@@ -115,37 +127,41 @@ def getSectionFlag(currentCell):
 # width, tolerance, and information about panels and coupons.
 def parseExcel(sheet):
     spreadsheetDictionary = {}
+    rectangularCouponArray = []
+    circularCouponArray = []
     sectionFlag = 'defaults'
     for i in range(sheet.nrows):
         print "{0} / {1} ".format(i, sheet.nrows)
         currentCell = sheet.cell_value(i,0)
-        sectionFlag = getSectionFlag(currentCell)
+        sectionFlag = getSectionFlag(sectionFlag, currentCell)
 
         print currentCell
         print "spreadsheetDictionary so far: {0}".format(spreadsheetDictionary)
         print "Section flag : {0}".format(sectionFlag)
-        raw_input('Check the current cell above')
-
-        continue # Go to next row to avoid having to handle extra bad cases
 
         if (sectionFlag == 'defaults'):
-            defaults = getDefaults(sheet, curr, i, spreadsheetDictionary):
+            print "Got here 1"
+            defaults = getDefaults(sheet, curr, i, spreadsheetDictionary)
             if defaults: # if valid
-                ssd = defaults
+                spreadsheetDictionary = defaults
             else:
                 raise Exception("Defaults must be numbers.")
         elif (sectionFlag == 'break'):
+            print "got here 2"
             continue
         elif (sectionFlag == 'panel'):
+            print "got here 3"
             panelDim = getPanelDimensions(sheet, i, spreadsheetDictionary)
             if panelDim: # if valid
-                ssd = panelDim
+                spreadsheetDictionary = panelDim
             else:
                 raise Exception("Panel dimensions must be numbers.")
         elif (sectionFlag == 'rectangularCoupons'): #we are parsing through the data for rectangular/circular coupons
             print "rectangular coupons."
         elif (sectionFlag == 'circularCoupons'):
             print "circular coupons."
+
+        raw_input('Check the current cell above')
     return spreadsheetDictionary
 
 
