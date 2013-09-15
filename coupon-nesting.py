@@ -19,14 +19,16 @@ def openSpreadsheet():
 # width, tolerance, 
 def parseExcel(sheet):
     spreadsheetDictionary = {}
+    sectionFlag = 'defaults'
     for i in range(sheet.nrow):
         currentCell = sheet.cell_value(i,0)
         # At defaults header
-        if (currentCell == 'Defaults') and (sheet.cell_value(i, 1) == xlrd.empty_cell.value):
+        if (sectionFlag == 'defaults'):
         	spreadsheetDictionary['bladeWidth'] = sheet.cell_value(i+1, 1)
         	spreadsheetDictionary['tolerance'] = sheet.cell_value(i+2, 1)
         	i+=2
         elif (currentCell == 'Panel'):
-
+            sectionFlag = 'panel'
+            continue
         elif (currentCell == xlrd.empty_cell.value):
         	continue
