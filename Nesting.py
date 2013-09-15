@@ -89,7 +89,7 @@ def getSectionFlag(currentSF, currentCell):
 # Input: spreadsheet, row, spreadsheetDictionary
 # Output: updated spreadsheetDictionary
 def getDefaults(sheet, curr, row, ssd):
-    print "sheet: {0}".format(sheet)
+    print "sheet: {0}".format(vars(sheet))
     if curr == 'blade width' and isNumber(sheet.cell_value(row,1)):
         ssd['bladeWidth'] = sheet.cell_value(row, 1)
     elif curr == 'tolerance' and isNumber(sheet.cell_value(row,1)):
@@ -129,11 +129,18 @@ def parseExcel(sheet):
     spreadsheetDictionary = {}
     rectangularCouponArray = []
     circularCouponArray = []
-    sectionFlag = 'defaults'
+    sectionFlag = ''
     for i in range(sheet.nrows):
         print "{0} / {1} ".format(i, sheet.nrows)
         currentCell = sheet.cell_value(i,0)
-        sectionFlag = getSectionFlag(sectionFlag, currentCell)
+
+        # If we move into a new section, then the sectionFlag will change.
+        # This will not move the iterator and will go into the parsing phase below.
+        # Use a continue if the flags are not equal and update sectionFlag.
+        newSectionFlag = getSectionFlag(sectionFlag, currentCell)
+        if not (newSectionFlag == sectionFlag):
+            sectionFlag = newSectionFlag
+            continue
 
         print currentCell
         print "spreadsheetDictionary so far: {0}".format(spreadsheetDictionary)
@@ -141,11 +148,12 @@ def parseExcel(sheet):
 
         if (sectionFlag == 'defaults'):
             print "Got here 1"
-            defaults = getDefaults(sheet, curr, i, spreadsheetDictionary)
+            defaults = getDefaults(sheet, currentCell, i, spreadsheetDictionary)
+            print defaults
             if defaults: # if valid
                 spreadsheetDictionary = defaults
             else:
-                raise Exception("Defaults must be numbers.")
+                continue
         elif (sectionFlag == 'break'):
             print "got here 2"
             continue
@@ -155,7 +163,7 @@ def parseExcel(sheet):
             if panelDim: # if valid
                 spreadsheetDictionary = panelDim
             else:
-                raise Exception("Panel dimensions must be numbers.")
+                continue
         elif (sectionFlag == 'rectangularCoupons'): #we are parsing through the data for rectangular/circular coupons
             print "rectangular coupons."
         elif (sectionFlag == 'circularCoupons'):
