@@ -1,12 +1,18 @@
 import xlrd
 import Tkinter, tkFileDialog
 
+# This class is the base class for Coupons
 class Coupon:
     def __init__(self):
         self.couponSeries
         self.bladeWidth
         self.quantity
+    x0 = 0
+    y0 = 0
+    x1 = 0
+    y1 = 0
 
+# This is the extension of Coupon
 class RectangularCoupon(Coupon):
     def __init__(self, couponSeries, quantity, length, width, bladeWidth):
         self.couponSeries = couponSeries
@@ -15,11 +21,8 @@ class RectangularCoupon(Coupon):
         self.length = length
         self.bladeWidth = bladeWidth
         self.area = length*width + (length+width)*bladeWidth #simple area calculation to account for bladeWidth
-        self.x0
-        self.y0
-        self.x1
-        self.y1
 
+# Extension of Coupon
 class CircularCoupon(Coupon):
     def __init__(self, couponSeries, quantity, radius, bladeWidth):
         self.couponSeries = couponSeries
@@ -28,10 +31,6 @@ class CircularCoupon(Coupon):
         self.diameter = radius << 1
         self.bladeWidth = bladeWidth
         self.area = self.diameter * self.diameter + (self.diameter + self.diameter)*bladeWidth
-        self.x0
-        self.y0
-        self.x1
-        self.y1
 
 # Input: none
 # Output: spreadsheet 
@@ -63,9 +62,9 @@ def parseExcel(sheet):
         raw_input('Check the current cell above')
         # At defaults header
         if (sectionFlag == 'defaults'):
-        	spreadsheetDictionary['bladeWidth'] = sheet.cell_value(i+1, 1)
-        	spreadsheetDictionary['tolerance'] = sheet.cell_value(i+2, 1)
-        	i+=2
+            spreadsheetDictionary['bladeWidth'] = sheet.cell_value(i+1, 1)
+            spreadsheetDictionary['tolerance'] = sheet.cell_value(i+2, 1)
+            i+=2
         elif (currentCell == 'Panel'):
             sectionFlag = 'panel'
             pLength = sheet.cell_value(i+1, 0)
@@ -79,12 +78,11 @@ def parseExcel(sheet):
         elif (currentCell == "Circiular Coupons"):
             sectionFlag = 'circularCoupons'
         elif (currentCell == xlrd.empty_cell.value):
-        	continue
+            continue
         else: #we are parsing through the data for rectangular/circular coupons
             #extractRowData(sheet, sectionFlag)
             print "Currently done."
-
-        return spreadsheetDictionary
+    return spreadsheetDictionary
 
 
 
