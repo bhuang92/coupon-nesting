@@ -203,7 +203,7 @@ def parseExcel(sheet):
             if currentCell == 'Coupon series':
                 continue
             else:
-                rectCoupon = getCircularCoupon(sheet, i, spreadsheetDictionary)
+                circCoupon = getCircularCoupon(sheet, i, spreadsheetDictionary)
                 if circCoupon: # if valid
                     circularCouponArray.append(circCoupon)
                 else:
