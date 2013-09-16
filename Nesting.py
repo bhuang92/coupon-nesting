@@ -40,7 +40,7 @@ class CircularCoupon(Coupon):
         self.couponSeries = couponSeries
         self.quantity = quantity
         self.radius = radius
-        self.diameter = radius << 1
+        self.diameter = radius *2
         self.bladeWidth = bladeWidth
         self.area = self.diameter * self.diameter + (self.diameter + self.diameter)*bladeWidth
 
@@ -116,10 +116,36 @@ def getPanelDimensions(sheet, row, ssd):
     else:
         return False
 
-# Input: spreadsheet, sectionFlag
-# Output: the information for the row parsed
+# Input: spreadsheet, row, sectionFlag
+# Output: a rectangularCoupon
 def getRectangularCoupon(sheet, row, ssd):
-   return False
+    series = sheet.cell_value(row, 0)
+    quantity = sheet.cell_value(row, 1)
+    length = sheet.cell_value(row, 2)
+    width = sheet.cell_value(row, 3)
+    bladeWidth = sheet.cell_value(row, 4)
+    if bladeWidth == '':
+        bladeWidth = ssd['bladeWidth']
+    if isNumber(quantity) and isNumber(length) and isNumber(width):
+        rectCoupon = RectangularCoupon(series, quantity, length, width, bladeWidth)
+        return rectCoupon
+    else:
+       return False
+
+# Input: spreadsheet, row, sectionFlag
+# Output: a circularCoupon
+def getCircularCoupon(sheet, row, ssd):
+    series = sheet.cell_value(row, 0)
+    quantity = sheet.cell_value(row, 1)
+    radius = sheet.cell_value(row, 2)
+    bladeWidth = sheet.cell_value(row, 3)
+    if bladeWidth == '':
+        bladeWidth = ssd['bladeWidth']
+    if isNumber(quantity) and isNumber(radius):
+        circCoupon = CircularCoupon(series, quantity, radius, bladeWidth)
+        return circCoupon
+    else:
+       return False
 
 # Input: spreadsheet
 # Output: a dictionary containing the spreadsheet information
@@ -165,10 +191,25 @@ def parseExcel(sheet):
             else:
                 continue
         elif (sectionFlag == 'rectangularCoupons'): #we are parsing through the data for rectangular/circular coupons
-            print "rectangular coupons."
+            if currentCell == 'Coupon series':
+                continue
+            else:
+                rectCoupon = getRectangularCoupon(sheet, i, spreadsheetDictionary)
+                if rectCoupon: # if valid
+                    rectangularCouponArray.append(rectCoupon)
+                else:
+                    continue
         elif (sectionFlag == 'circularCoupons'):
-            print "circular coupons."
-
+            if currentCell == 'Coupon series':
+                continue
+            else:
+                rectCoupon = getCircularCoupon(sheet, i, spreadsheetDictionary)
+                if circCoupon: # if valid
+                    circularCouponArray.append(circCoupon)
+                else:
+                    continue
+        spreadsheetDictionary['rectCoupons'] = rectangularCouponArray
+        spreadsheetDictionary['circCoupons'] = circularCouponArray
         raw_input('Check the current cell above')
     return spreadsheetDictionary
 
