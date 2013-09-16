@@ -4,7 +4,7 @@ Date: September 2013
 '''
 
 import xlrd
-import Tkinter, tkFileDialog
+import Tkinter as tk, tkFileDialog
 import copy
 
 # This class is the base class for Coupons
@@ -50,7 +50,7 @@ class CircularCoupon(Coupon):
 # of the spreadsheet. Then the spreadsheet is opened up and the spreadsheet 
 # object is returned.
 def oss():#openSpreadsheet():
-    root = Tkinter.Tk()
+    root = tk.Tk()
     root.withdraw()
     file_path = tkFileDialog.askopenfilename()
     book = xlrd.open_workbook(file_path)
@@ -202,8 +202,40 @@ def parseExcel(sheet):
         spreadsheetDictionary['circCoupons'] = circularCouponArray
     return spreadsheetDictionary
 
+''' Excel parsing code is above '''
+''' Algorithm code is below '''
 
+''' Drawing code is below '''
+import Image, ImageDraw
 
+width = 400
+height = 300
+center = height//2
+white = (255, 255, 255)
+green = (0,128,0)
+
+root = tk.Tk()
+
+# Tkinter create a canvas to draw on
+cv = tk.Canvas(root, width=width, height=height, bg='white')
+cv.pack()
+
+# PIL create an empty image and draw object to draw on
+# memory only, not visible
+image1 = Image.new("RGB", (width, height), white)
+draw = ImageDraw.Draw(image1)
+
+# do the Tkinter canvas drawings (visible)
+cv.create_line([0, center, width, center], fill='green')
+
+# do the PIL image/draw (in memory) drawings
+draw.line([0, center, width, center], green)
+
+# PIL image can be saved as .png .jpg .gif or .bmp file (among others)
+filename = "my_drawing.png"
+image1.save(filename)
+
+root.mainloop()
 
 
 
