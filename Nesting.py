@@ -70,26 +70,20 @@ def isNumber(s):
 def getSectionFlag(currentSF, currentCell):
     sf = currentSF
     if (currentCell == 'Defaults'):
-        print "1"
         sf = 'defaults'
     elif (currentCell == 'Panel'):
         sf = 'panel'
-        print "2"
     elif (currentCell == 'Rectangular Coupons'):
         sf = 'rectangularCoupons'
-        print "3"
     elif (currentCell == 'Circular Coupons'):
         sf = 'circularCoupons'
-        print "4"
     elif (currentCell == xlrd.empty_cell.value):
         sf = 'break'
-        print "5"
     return sf
 
 # Input: spreadsheet, row, spreadsheetDictionary
 # Output: updated spreadsheetDictionary
 def getDefaults(sheet, curr, row, ssd):
-    print "sheet: {0}".format(vars(sheet))
     if curr == 'blade width' and isNumber(sheet.cell_value(row,1)):
         ssd['bladeWidth'] = sheet.cell_value(row, 1)
     elif curr == 'tolerance' and isNumber(sheet.cell_value(row,1)):
@@ -157,7 +151,7 @@ def parseExcel(sheet):
     circularCouponArray = []
     sectionFlag = ''
     for i in range(sheet.nrows):
-        print "{0} / {1} ".format(i, sheet.nrows)
+        #print "{0} / {1} ".format(i, sheet.nrows)
         currentCell = sheet.cell_value(i,0)
 
         # If we move into a new section, then the sectionFlag will change.
@@ -168,23 +162,19 @@ def parseExcel(sheet):
             sectionFlag = newSectionFlag
             continue
 
-        print currentCell
-        print "spreadsheetDictionary so far: {0}".format(spreadsheetDictionary)
-        print "Section flag : {0}".format(sectionFlag)
+        # print currentCell
+        # print "spreadsheetDictionary so far: {0}".format(spreadsheetDictionary)
+        # print "Section flag : {0}".format(sectionFlag)
 
         if (sectionFlag == 'defaults'):
-            print "Got here 1"
             defaults = getDefaults(sheet, currentCell, i, spreadsheetDictionary)
-            print defaults
             if defaults: # if valid
                 spreadsheetDictionary = defaults
             else:
                 continue
         elif (sectionFlag == 'break'):
-            print "got here 2"
             continue
         elif (sectionFlag == 'panel'):
-            print "got here 3"
             panelDim = getPanelDimensions(sheet, i, spreadsheetDictionary)
             if panelDim: # if valid
                 spreadsheetDictionary = panelDim
@@ -210,7 +200,6 @@ def parseExcel(sheet):
                     continue
         spreadsheetDictionary['rectCoupons'] = rectangularCouponArray
         spreadsheetDictionary['circCoupons'] = circularCouponArray
-        raw_input('Check the current cell above')
     return spreadsheetDictionary
 
 
